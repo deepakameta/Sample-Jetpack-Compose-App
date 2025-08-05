@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robustdev.samplecomposeapp.model.Post
 import com.robustdev.samplecomposeapp.datasource.remote.PostRepo
+import com.robustdev.samplecomposeapp.usecase.GetPostsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,7 @@ sealed class PostUiState {
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-    private val repo: PostRepo
+    private val useCase: GetPostsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PostUiState>(PostUiState.Loading)
@@ -34,7 +35,7 @@ class SampleViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val result = repo.getPosts()
+                val result = useCase()
                 _uiState.value = PostUiState.Success(result)
             } catch (e: Exception) {
                 _uiState.value = PostUiState.Error(e.message ?: "Unknown error")
